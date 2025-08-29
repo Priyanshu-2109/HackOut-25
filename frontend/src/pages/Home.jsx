@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { features } from "../assets/assets";
+import { useModal } from "../context/ModalContext";
 import {
   MapIcon,
   CpuChipIcon,
@@ -12,6 +13,8 @@ import {
 } from "@heroicons/react/24/outline";
 
 const Home = () => {
+  const { openSignup } = useModal();
+
   const getIcon = (iconName) => {
     switch (iconName) {
       case "map":
@@ -103,12 +106,12 @@ const Home = () => {
           >
             <Link
               to="/signup"
-              className="group bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center"
+              className="group bg-gradient-to-r from-blue-600 to-green-600 hover:from-blue-700 hover:to-green-700 text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center no-underline"
             >
               Start Mapping
               <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
             </Link>
-            <button className="group border-2 border-white/30 text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 backdrop-blur-sm flex items-center">
+            <button className="group border-2 bg-gradient-to-r  border-white/30 text-black hover:bg-white/10 hover:text-white px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 backdrop-blur-sm flex items-center">
               <PlayIcon className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
               Watch Demo
             </button>
@@ -230,16 +233,16 @@ const Home = () => {
               AI-powered optimization platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/signup"
-                className="group bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg inline-flex items-center justify-center"
+              <button
+                onClick={openSignup}
+                className="group bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-lg inline-flex items-center justify-center no-underline"
               >
                 Get Started Today
                 <ArrowRightIcon className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </Link>
+              </button>
               <Link
                 to="/map"
-                className="group border-2 border-white text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 backdrop-blur-sm inline-flex items-center justify-center"
+                className="group border-2 border-white text-white hover:bg-white/10 px-8 py-4 rounded-xl text-lg font-semibold transition-all duration-300 backdrop-blur-sm inline-flex items-center justify-center no-underline"
               >
                 Explore Map
               </Link>

@@ -20,7 +20,7 @@ const PipelineCard = ({ pipeline }) => {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-200">
       <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-3">
+        <div className="flex gap-2 items-center space-x-3">
           <div className="p-2 bg-blue-100 rounded-lg">
             <RectangleGroupIcon className="h-6 w-6 text-blue-600" />
           </div>
