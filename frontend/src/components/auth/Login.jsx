@@ -134,7 +134,7 @@ const Login = React.memo(({ onClose, isModal = false }) => {
         {isModal && onClose && (
           <button
             type="button"
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors bg-transparent border-none p-0"
             onClick={onClose}
           >
             <XMarkIcon className="h-6 w-6" />
