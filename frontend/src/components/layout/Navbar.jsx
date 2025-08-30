@@ -48,7 +48,7 @@ const Navbar = () => {
             >
               <Logo className="h-10 w-10" />
               <span className="text-xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-green-600 bg-clip-text text-transparent">
-                HydroGrid
+                GreenInfra
               </span>
             </Link>
           </div>
@@ -70,15 +70,15 @@ const Navbar = () => {
                     {item.name}
                   </Link>
                 ))}
-                <div className="flex items-center space-x-4 ml-8 pl-8 border-l border-gray-200">
-                  <div className="flex items-center space-x-3">
+                <div className="flex items-center gap-7 space-x-4 ml-8 pl-8 border-l border-gray-200">
+                  <div className="flex items-center gap-2 space-x-3">
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
                       <span className="text-white text-sm font-semibold">
                         {user?.username?.charAt(0).toUpperCase()}
                       </span>
                     </div>
                     <span className="text-sm text-gray-700 font-medium">
-                      {user?.username}
+                      Hello {user?.username}
                     </span>
                   </div>
                   <button
