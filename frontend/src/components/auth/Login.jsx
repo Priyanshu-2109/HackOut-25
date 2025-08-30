@@ -101,16 +101,16 @@ const Login = React.memo(({ onClose, isModal = false }) => {
 
   const formVariants = useMemo(
     () => ({
-      hidden: { opacity: 0, y: -50 },
+      hidden: { opacity: 0, scale: 0.8 },
       visible: {
         opacity: 1,
-        y: 0,
-        transition: { duration: 0.5, ease: "easeOut" },
+        scale: 1,
+        transition: { duration: 0.2, ease: "easeOut" },
       },
       exit: {
         opacity: 0,
-        y: -50,
-        transition: { duration: 0.5, ease: "easeIn" },
+        scale: 0.8,
+        transition: { duration: 0.2, ease: "easeIn" },
       },
     }),
     []
