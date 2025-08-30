@@ -9,9 +9,9 @@ import { AuthProvider } from "./context/AuthContext";
 import { ModalProvider } from "./context/ModalContext";
 import ErrorBoundary from "./components/layout/ErrorBoundary";
 import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
 import Home from "./pages/Home";
 import Login from "./components/auth/Login";
-import Signup from "./components/auth/Signup";
 import Dashboard from "./pages/Dashboard";
 import InfrastructureMap from "./pages/InfrastructureMap";
 import Optimization from "./pages/Optimization";
@@ -21,31 +21,21 @@ import ProtectedRoute from "./utils/ProtectedRoute";
 import { useModal } from "./context/ModalContext";
 
 // Modal Container Component
-const ModalContainer = () => {
-  const { 
-    isLoginOpen, 
-    isSignupOpen, 
-    closeLogin, 
-    closeSignup, 
-    switchToSignup, 
-    switchToLogin 
-  } = useModal();
+const ModalContainer = React.memo(() => {
+  const { isLoginOpen, isSignupOpen, closeLogin, closeSignup } = useModal();
+
+  if (!isLoginOpen && !isSignupOpen) {
+    return null;
+  }
 
   return (
-    <>
-      <Login 
-        isOpen={isLoginOpen} 
-        onClose={closeLogin}
-        onSwitchToSignup={switchToSignup}
-      />
-      <Signup 
-        isOpen={isSignupOpen} 
-        onClose={closeSignup}
-        onSwitchToLogin={switchToLogin}
-      />
-    </>
+    <Login
+      onClose={isLoginOpen ? closeLogin : closeSignup}
+      isModal={true}
+      key="login-modal"
+    />
   );
-};
+});
 
 function App() {
   return (
@@ -92,6 +82,7 @@ function App() {
                 <Route path="/404" element={<NotFound />} />
                 <Route path="*" element={<Navigate to="/404" replace />} />
               </Routes>
+              <Footer />
               <ModalContainer />
             </div>
           </Router>

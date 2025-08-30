@@ -1,214 +1,282 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../../context/AuthContext";
-import {
-  EyeIcon,
-  EyeSlashIcon,
-  UserIcon,
-  LockClosedIcon,
-  XMarkIcon,
-} from "@heroicons/react/24/outline";
+import { FaGoogle } from "react-icons/fa";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 
-const Login = ({ isOpen, onClose, onSwitchToSignup }) => {
+const Login = React.memo(({ onClose, isModal = false }) => {
+  const navigate = useNavigate();
+  const { login, signup } = useAuth();
+  const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     password: "",
   });
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-    // Clear error when user starts typing
-    if (error) setError("");
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const handleChange = useCallback((e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
     setError("");
+    // Optional: Add console.log for debugging (remove in production)
+    // console.log(`Field ${name} changed to:`, value);
+  }, []);
 
-    // Basic validation
-    if (!formData.username || !formData.password) {
-      setError("Please fill in all fields");
-      setIsLoading(false);
-      return;
-    }
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+      setError("");
 
-    // Simulate API call delay
-    setTimeout(() => {
-      const success = login(formData.username, formData.password);
-
-      if (success) {
-        onClose(); // Close modal
-        navigate("/dashboard");
-      } else {
-        setError(
-          'Invalid username or password. Try: username: "user123", password: "password"'
-        );
+      try {
+        if (isSignUp) {
+          // Use signup function for registration
+          const success = signup({
+            username: formData.username,
+            email: formData.email,
+          });
+          if (success) {
+            if (onClose) onClose();
+            navigate("/dashboard");
+          } else {
+            setError("Registration failed");
+          }
+        } else {
+          // Login
+          const success = login(
+            formData.email || formData.username,
+            formData.password
+          );
+          if (success) {
+            if (onClose) onClose();
+            navigate("/dashboard");
+          } else {
+            setError("Invalid credentials");
+          }
+        }
+      } catch (err) {
+        setError("An error occurred");
       }
-      setIsLoading(false);
-    }, 1000);
-  };
+    },
+    [isSignUp, formData, login, signup, onClose, navigate]
+  );
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
+  const handleGoogleLogin = useCallback(async () => {
+    try {
+      // Simulate Google login/signup
+      const success = signup({
+        username: "Google User",
+        email: "user@google.com",
+      });
+      if (success) {
+        if (onClose) onClose();
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      setError("Failed to login with Google");
     }
-  };
+  }, [signup, onClose, navigate]);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isModal) {
+      document.body.style.overflow = "hidden";
+      return () => {
+        document.body.style.overflow = "unset";
+      };
+    }
+  }, [isModal]);
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center px-4"
-      onClick={handleBackdropClick}
-    >
-      {/* Backdrop with blur effect */}
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-md"></div>
-      
-      {/* Modal content */}
-      <div className="relative bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl w-full max-w-md mx-auto">
-        {/* Close button */}
+  const backdropVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0 },
+      visible: { opacity: 1, transition: { duration: 0.3 } },
+      exit: { opacity: 0, transition: { duration: 0.3 } },
+    }),
+    []
+  );
+
+  const formVariants = useMemo(
+    () => ({
+      hidden: { opacity: 0, y: -50 },
+      visible: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.5, ease: "easeOut" },
+      },
+      exit: {
+        opacity: 0,
+        y: -50,
+        transition: { duration: 0.5, ease: "easeIn" },
+      },
+    }),
+    []
+  );
+
+  const FormContent = React.useMemo(
+    () => (
+      <motion.form
+        onClick={(e) => isModal && e.stopPropagation()}
+        className={`${
+          isModal
+            ? "bg-white p-8 rounded-xl shadow-2xl w-full max-w-md mx-4 text-gray-900 relative border"
+            : "bg-white p-8 rounded-lg shadow-lg w-full max-w-md mx-auto"
+        }`}
+        variants={formVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+        onSubmit={handleSubmit}
+      >
+        {isModal && onClose && (
+          <button
+            type="button"
+            className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            onClick={onClose}
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        )}
+
+        <div className="flex flex-col gap-2">
+          <h1 className="text-2xl font-bold text-center text-gray-900">
+            {isSignUp ? "Create Account" : "Welcome back!"}
+          </h1>
+          <p className="text-sm text-center mb-6 text-gray-600">
+            {isSignUp
+              ? "Join HydroGrid platform"
+              : "Please sign in to continue"}
+          </p>
+        </div>
+
+        {isSignUp && (
+          <input
+            name="username"
+            type="text"
+            placeholder="Full Name"
+            className="w-full px-4 py-3 rounded-lg mb-4 transition-colors bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-green-500"
+            value={formData.username}
+            onChange={handleChange}
+            required
+          />
+        )}
+
+        <input
+          name="email"
+          type="email"
+          placeholder="Email Address"
+          className="w-full px-4 py-3 rounded-lg mb-4 transition-colors bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-green-500"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
+
+        <input
+          name="password"
+          type="password"
+          placeholder="Password"
+          className="w-full px-4 py-3 rounded-lg mb-4 transition-colors bg-gray-50 border border-gray-300 text-gray-900 placeholder:text-gray-500 focus:outline-none focus:border-green-500"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
+
+        {!isSignUp && (
+          <p className="text-sm text-right cursor-pointer mb-4 transition-colors text-green-600 hover:text-green-500">
+            Forgot password?
+          </p>
+        )}
+
+        {error && (
+          <div className="text-red-500 text-sm text-center mb-4">{error}</div>
+        )}
+
         <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 text-black border-0 hover:text-gray-600"
+          type="submit"
+          className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 text-md font-medium rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-300 shadow-md"
         >
-          <XMarkIcon className="h-5 w-5" />
+          {isSignUp ? "Create Account" : "Sign In"}
         </button>
 
-        <div className="px-8 py-10">
-          <div className="text-center mb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-500 to-green-500 rounded-2xl flex items-center justify-center mb-6">
-              <UserIcon className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome Back
-            </h2>
-            <p className="text-gray-600">
-              Sign in to your Green Hydrogen account
-            </p>
-          </div>
-
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm">
-                {error}
-              </div>
-            )}
-
-            <div className="space-y-1">
-              <label
-                htmlFor="username"
-                className="block text-sm font-semibold text-gray-700 mb-3"
-              >
-                Username
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <UserIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  required
-                  value={formData.username}
-                  onChange={handleChange}
-                  className="block w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl placeholder-gray-500 text-gray-900 focus:outline-none focus:border-blue-500"
-                  placeholder="Enter your username"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1">
-              <label
-                htmlFor="password"
-                className="block text-sm font-semibold text-gray-700 mb-3"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <LockClosedIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  className="block w-full pl-12 pr-14 py-4 bg-white border border-gray-200 rounded-xl placeholder-gray-500 text-gray-900 focus:outline-none focus:border-blue-500"
-                  placeholder="Enter your password"
-                />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 border-0 right-0  pr-5 flex  items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            <div className="pt-4">
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-4 px-6 text-sm font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                    Signing in...
-                  </div>
-                ) : (
-                  "Sign In"
-                )}
-              </button>
-            </div>
-
-            <div className="text-center pt-4">
-              <p className="text-sm text-gray-600">
-                Don't have an account?{" "}
-                <button
-                  type="button"
-                  onClick={onSwitchToSignup}
-                  className="font-semibold text-blue-600 hover:text-blue-500 border-0 no-underline"
-                >
-                  Sign up here
-                </button>
-              </p>
-            </div>
-          </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-              <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
-              Demo Credentials
-            </h4>
-            <div className="space-y-1">
-              <p className="text-xs text-gray-600 font-mono bg-white px-2 py-1 rounded">Username: user123</p>
-              <p className="text-xs text-gray-600 font-mono bg-white px-2 py-1 rounded">Password: password</p>
-            </div>
-          </div>
+        {/* Separator Line */}
+        <div className="flex items-center gap-2 my-6">
+          <div className="w-full h-px bg-gray-300"></div>
+          <span className="text-sm whitespace-nowrap text-gray-500">OR</span>
+          <div className="w-full h-px bg-gray-300"></div>
         </div>
-      </div>
+
+        {/* Google Login Button */}
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg mb-4 transition-colors border border-gray-300 text-gray-700 hover:bg-gray-50"
+        >
+          <FaGoogle size={20} className="text-blue-500" />
+          <span>Continue with Google</span>
+        </button>
+
+        <p className="text-center text-sm mt-6 text-gray-600">
+          {isSignUp ? (
+            <>
+              Already have an account?{" "}
+              <span
+                className="cursor-pointer transition-colors text-green-600 hover:text-green-500"
+                onClick={() => setIsSignUp(false)}
+              >
+                Sign In
+              </span>
+            </>
+          ) : (
+            <>
+              Don&apos;t have an account?{" "}
+              <span
+                className="cursor-pointer transition-colors text-green-600 hover:text-green-500"
+                onClick={() => setIsSignUp(true)}
+              >
+                Sign Up
+              </span>
+            </>
+          )}
+        </p>
+      </motion.form>
+    ),
+    [
+      isModal,
+      onClose,
+      isSignUp,
+      formData,
+      error,
+      handleSubmit,
+      handleGoogleLogin,
+      formVariants,
+    ]
+  );
+
+  // If it's a modal, wrap in backdrop
+  if (isModal) {
+    return (
+      <motion.div
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 backdrop-blur-sm overflow-y-auto p-4"
+        onClick={onClose}
+        variants={backdropVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit"
+      >
+        {FormContent}
+      </motion.div>
+    );
+  }
+
+  // Otherwise render as a page
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">{FormContent}</div>
     </div>
   );
-};
+});
 
 export default Login;
