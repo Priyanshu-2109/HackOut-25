@@ -51,7 +51,6 @@ export const getProfile = asyncHandler(async (req, res) => {
 
 export const updateProfile = [
   body("fullname").optional().isString().trim(),
-  body("phoneNo").optional().isString().trim(),
   body("email").optional().isEmail().normalizeEmail(),
   asyncHandler(async (req, res) => {
     const errors = validationResult(req);
@@ -71,7 +70,6 @@ export const updateProfile = [
     if (!user) throw new ApiError(404, "User not found");
 
     if (req.body.fullname) user.fullname = req.body.fullname;
-    if (req.body.phoneNo) user.phoneNo = req.body.phoneNo;
     if (req.body.email) user.email = req.body.email;
 
     await user.save({ validateBeforeSave: false });
@@ -89,7 +87,6 @@ const registerValidators = [
     .withMessage(
       "Password must be at least 8 characters and include uppercase, lowercase, number, and special character."
     ),
-  body("phoneNo").isString().trim().notEmpty().isLength({ min: 10, max: 15 }),
 ];
 
 export const register = [
@@ -109,7 +106,7 @@ export const register = [
       );
     }
 
-    const { fullname, email, password, phoneNo } = req.body;
+    const { fullname, email, password } = req.body;
     const username = req.body.username.toLowerCase();
 
     const existed = await User.findOne({ $or: [{ username }, { email }] });
@@ -121,7 +118,6 @@ export const register = [
       fullname,
       email,
       password,
-      phoneNo,
     });
 
     const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
@@ -246,17 +242,22 @@ export const deleteAccount = asyncHandler(async (req, res) => {
 });
 
 export const updateAccountDetails = asyncHandler(async (req, res) => {
-  const { fullname, phoneNo, email } = req.body;
+  const { fullname, email } = req.body;
 
-  if (!fullname && !phoneNo && !email)
+  if (!fullname && !email)
     throw new ApiError(400, "All fields cannot be empty");
 
   const user = await User.findById(req.user?._id);
   if (!user) throw new ApiError(400, "User doesn't exist");
 
+  let emailChanged = false;
+  if (email && email !== user.email) {
+    user.email = email;
+    user.isVerified = false;
+    emailChanged = true;
+  }
+
   user.fullname = fullname || user.fullname;
-  user.phoneNo = phoneNo || user.phoneNo;
-  user.email = email || user.email;
 
   await user.save({ validateBeforeSave: false });
 
@@ -264,11 +265,13 @@ export const updateAccountDetails = asyncHandler(async (req, res) => {
     "-password -refreshToken"
   );
 
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(200, updatedUser, "Account details updated successfully")
-    );
+  let message = "Account details updated successfully";
+  if (emailChanged) {
+    message +=
+      ". Please verify your new email address using the OTP that will be sent.";
+  }
+
+  return res.status(200).json(new ApiResponse(200, updatedUser, message));
 });
 
 export const changeCurrentPassword = asyncHandler(async (req, res) => {
@@ -290,7 +293,6 @@ export const changeCurrentPassword = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Password changed successfully"));
 });
 
-// --- Forgot/Reset Password ---
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
   if (!email) throw new ApiError(400, "Email is required");
@@ -303,7 +305,7 @@ export const forgotPassword = asyncHandler(async (req, res) => {
   user.resetPasswordExpires = Date.now() + 1000 * 60 * 15;
   await user.save({ validateBeforeSave: false });
 
-  await sendEmail(
+  sendEmail(
     email,
     "Password Reset",
     `Your password reset token: ${resetToken}`
