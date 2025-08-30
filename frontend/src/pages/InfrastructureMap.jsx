@@ -34,8 +34,8 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const createCustomIcon = (color, type) => {
   const svgIcon = `
     <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="15" cy="15" r="12" fill="${color}" stroke="white" stroke-width="2"/>
-      <text x="15" y="20" text-anchor="middle" fill="white" font-size="12" font-weight="bold">
+      <circle cx="15" cy="15" r="12" fill="${color}" stroke="white" strokeWidth="2"/>
+      <text x="15" y="20" textAnchor="middle" fill="white" fontSize="12" fontWeight="bold">
         ${type}
       </text>
     </svg>
