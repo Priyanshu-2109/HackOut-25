@@ -127,40 +127,40 @@ const InfrastructureMap = () => {
               </h3>
 
               <div className="space-y-4">
-                <label className="flex items-center space-x-3 cursor-pointer">
+                <label className="flex gap-2 items-center space-x-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={activeLayer.plants}
                     onChange={() => toggleLayer("plants")}
                     className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2 space-x-2">
                     <div className="w-4 h-4 bg-blue-500 rounded-full"></div>
                     <span className="text-gray-700">Production Plants</span>
                   </div>
                 </label>
 
-                <label className="flex items-center space-x-3 cursor-pointer">
+                <label className="flex items-center gap-2 space-x-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={activeLayer.storage}
                     onChange={() => toggleLayer("storage")}
                     className="w-4 h-4 text-green-600 rounded focus:ring-green-500"
                   />
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2 space-x-2">
                     <div className="w-4 h-4 bg-green-500 rounded-full"></div>
                     <span className="text-gray-700">Storage Facilities</span>
                   </div>
                 </label>
 
-                <label className="flex items-center space-x-3 cursor-pointer">
+                <label className="flex items-center gap-2 space-x-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={activeLayer.pipelines}
                     onChange={() => toggleLayer("pipelines")}
                     className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
                   />
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-2 space-x-2">
                     <div className="w-4 h-1 bg-purple-500 rounded"></div>
                     <span className="text-gray-700">Pipelines</span>
                   </div>

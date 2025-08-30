@@ -73,6 +73,27 @@ const Optimization = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -97,42 +118,47 @@ const Optimization = () => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
-            <div className="bg-white rounded-xl shadow-lg p-6 sticky top-24">
-              <div className="flex items-center space-x-2 mb-6">
+            <div className="bg-white rounded-xl shadow-lg p-4 sticky top-16">
+              <div className="flex items-center space-x-2 mb-1">
                 <AdjustmentsHorizontalIcon className="h-6 w-6 text-blue-600" />
                 <h3 className="text-lg font-semibold text-gray-900">
                   Optimization Parameters
                 </h3>
               </div>
 
-              <div className="space-y-6">
+              <div className="space-y-8">
                 {/* Budget */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="py-2">
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
                     Budget (Million USD)
                   </label>
-                  <input
-                    type="range"
-                    min="100"
-                    max="1000"
-                    value={optimizationParams.budget}
-                    onChange={(e) =>
-                      handleParamChange("budget", e.target.value)
-                    }
-                    className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                  />
-                  <div className="flex justify-between text-sm text-gray-600 mt-1">
-                    <span>$100M</span>
-                    <span className="font-medium">
-                      ${optimizationParams.budget}M
-                    </span>
-                    <span>$1000M</span>
+                  <div className="relative">
+                    <input
+                      type="range"
+                      min="100"
+                      max="1000"
+                      value={optimizationParams.budget}
+                      onChange={(e) =>
+                        handleParamChange("budget", e.target.value)
+                      }
+                      className="w-full h-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full appearance-none cursor-pointer slider"
+                      style={{
+                        background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((optimizationParams.budget - 100) / 900) * 100}%, #e5f3ff ${((optimizationParams.budget - 100) / 900) * 100}%, #e5f3ff 100%)`
+                      }}
+                    />
+                    <div className="flex justify-between text-sm text-gray-600 mt-2">
+                      <span className="bg-gray-100 px-2 py-1 rounded">$100M</span>
+                      <span className="font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-lg">
+                        ${optimizationParams.budget}M
+                      </span>
+                      <span className="bg-gray-100 px-2 py-1 rounded">$1000M</span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Timeframe */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="py-3">
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
                     Timeframe (Years)
                   </label>
                   <select
@@ -140,7 +166,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("timeframe", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value={3}>3 Years</option>
                     <option value={5}>5 Years</option>
@@ -150,8 +176,8 @@ const Optimization = () => {
                 </div>
 
                 {/* Priority */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="py-4">
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
                     Optimization Priority
                   </label>
                   <select
@@ -159,7 +185,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("priority", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value="cost">Cost Minimization</option>
                     <option value="efficiency">Efficiency Maximization</option>
@@ -169,8 +195,8 @@ const Optimization = () => {
                 </div>
 
                 {/* Region */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="py-4">
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
                     Target Region
                   </label>
                   <select
@@ -178,7 +204,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("region", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value="north-america">North America</option>
                     <option value="europe">Europe</option>
@@ -188,8 +214,8 @@ const Optimization = () => {
                 </div>
 
                 {/* Demand Growth */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                <div className="py-2">
+                  <label className="block text-sm font-semibold text-gray-800 mb-2">
                     Demand Growth Scenario
                   </label>
                   <select
@@ -197,7 +223,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("demandGrowth", e.target.value)
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-2 py-2  border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value="conservative">
                       Conservative (15% annually)
@@ -209,60 +235,72 @@ const Optimization = () => {
                   </select>
                 </div>
 
-                <button
-                  onClick={handleOptimize}
-                  disabled={isOptimizing}
-                  className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-3 px-4 rounded-lg font-semibold hover:from-blue-700 hover:to-green-700 transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isOptimizing ? (
-                    <div className="flex items-center justify-center space-x-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                      <span>Optimizing...</span>
-                    </div>
-                  ) : (
-                    <div className="flex items-center justify-center space-x-2">
-                      <CpuChipIcon className="h-5 w-5" />
-                      <span>Run Optimization</span>
-                    </div>
-                  )}
-                </button>
+                <div className="pt-6">
+                  <button
+                    onClick={handleOptimize}
+                    disabled={isOptimizing}
+                    className="w-full bg-gradient-to-r from-blue-600 to-green-600 text-white py-4 px-6 rounded-xl font-semibold hover:from-blue-700 hover:to-green-700 transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+                  >
+                    {isOptimizing ? (
+                      <div className="flex items-center justify-center space-x-2">
+                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                        <span>Optimizing...</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center justify-center space-x-2">
+                        <CpuChipIcon className="h-5 w-5" />
+                        <span>Run Optimization</span>
+                      </div>
+                    )}
+                  </button>
+                </div>
               </div>
             </div>
           </motion.div>
 
           {/* Results Section */}
           <motion.div
-            className="lg:col-span-2 space-y-8"
+            className="lg:col-span-2 space-y-10"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
             {/* Predefined Scenarios */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                Optimization Scenarios
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <h3 className="text-xl gap-2 font-bold text-gray-900 mb-6 flex items-center space-x-2">
+                <span className="w-3 h-3 bg-blue-600 rounded-full"></span>
+                <span>Optimization Scenarios</span>
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {optimizationScenarios.map((scenario) => (
                   <div
                     key={scenario.id}
                     onClick={() => setSelectedScenario(scenario)}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                    className={`p-6 rounded-xl border-1 cursor-pointer transition-all duration-300 hover:shadow-lg transform hover:scale-105 ${
                       selectedScenario.id === scenario.id
-                        ? "border-blue-500 bg-blue-50"
+                        ? "border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 shadow-lg scale-105"
                         : "border-gray-200 hover:border-blue-300 hover:bg-gray-50"
                     }`}
                   >
-                    <h4 className="font-semibold text-gray-900 mb-2">
+                    <h4 className="font-bold text-gray-900 mb-3 text-lg">
                       {scenario.name}
                     </h4>
-                    <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">
                       {scenario.description}
                     </p>
-                    <div className="space-y-1 text-xs text-gray-500">
-                      <div>Budget: {scenario.parameters.budget}</div>
-                      <div>Priority: {scenario.parameters.priority}</div>
-                      <div>Timeframe: {scenario.parameters.timeframe}</div>
+                    <div className="space-y-2 text-xs text-gray-500 bg-white/60 p-3 rounded-lg">
+                      <div className="flex justify-between">
+                        <span>Budget:</span>
+                        <span className="font-medium">{scenario.parameters.budget}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Priority:</span>
+                        <span className="font-medium">{scenario.parameters.priority}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Timeframe:</span>
+                        <span className="font-medium">{scenario.parameters.timeframe}</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -270,30 +308,34 @@ const Optimization = () => {
             </div>
 
             {/* Cost Analysis */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex items-center space-x-2 mb-4">
-                <CurrencyDollarIcon className="h-6 w-6 text-green-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Cost Analysis
-                </h3>
+            <div className="bg-white rounded-2xl shadow-xl p-8">
+              <div className="flex items-center gap-2 space-x-3 mb-6">
+                <CurrencyDollarIcon className="h-7 w-7 text-green-600" />
+                <h3 className="text-xl font-bold text-gray-900">Cost Analysis</h3>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {Object.entries(costAnalysis).map(([category, data]) => (
-                  <div key={category} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="text-sm font-medium text-gray-600 capitalize mb-2">
+                  <div key={category} className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-sm font-bold text-gray-700 mb-4 uppercase tracking-wide">
                       {category}
                     </div>
-                    <div className="space-y-1">
-                      <div className="text-lg font-bold text-gray-900">
-                        {data.current}
+                    <div className="space-y-3">
+                      <div className="bg-white p-3 rounded-lg">
+                        <div className="text-xl font-bold text-gray-900">
+                          {data.current}
+                        </div>
+                        <div className="text-sm text-gray-500">Current</div>
                       </div>
-                      <div className="text-sm text-gray-600">Current</div>
-                      <div className="text-lg font-bold text-green-600">
-                        {data.optimized}
+                      <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+                        <div className="text-xl font-bold text-green-700">
+                          {data.optimized}
+                        </div>
+                        <div className="text-sm text-green-600">Optimized</div>
                       </div>
-                      <div className="text-sm text-gray-600">Optimized</div>
-                      <div className="text-sm font-medium text-green-600">
-                        ↓ {data.savings} savings
+                      <div className="bg-emerald-100 p-2 rounded-lg text-center">
+                        <div className="text-sm font-bold text-emerald-700">
+                          ↓ {data.savings} savings
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -304,89 +346,108 @@ const Optimization = () => {
             {/* Optimization Results */}
             {optimizationResults && (
               <motion.div
-                className="bg-white rounded-xl shadow-lg p-6"
+                className="bg-white rounded-2xl shadow-xl p-8"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
               >
-                <div className="flex items-center space-x-2 mb-4">
-                  <ChartBarIcon className="h-6 w-6 text-purple-600" />
-                  <h3 className="text-lg font-semibold text-gray-900">
+                <div className="flex items-center gap-2 space-x-3 mb-6">
+                  <ChartBarIcon className="h-7 w-7 text-purple-600" />
+                  <h3 className="text-xl font-bold text-gray-900">
                     Optimization Results
                   </h3>
                 </div>
 
                 {/* Summary Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                  <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-1 border-blue-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-blue-600 mb-2">
                       {optimizationResults.newPlants}
                     </div>
-                    <div className="text-sm text-gray-600">New Plants</div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">New Plants</div>
                   </div>
-                  <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">
+                  <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-1 border-green-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-green-600 mb-2">
                       {optimizationResults.newPipelines}
                     </div>
-                    <div className="text-sm text-gray-600">New Pipelines</div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">New Pipelines</div>
                   </div>
-                  <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-1 border-purple-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">
                       {optimizationResults.newStorage}
                     </div>
-                    <div className="text-sm text-gray-600">
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
                       Storage Facilities
                     </div>
                   </div>
-                  <div className="text-center p-4 bg-emerald-50 rounded-lg">
-                    <div className="text-2xl font-bold text-emerald-600">
+                  <div className="text-center p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border-1 border-emerald-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">
                       {optimizationResults.costSavings}
                     </div>
-                    <div className="text-sm text-gray-600">Cost Savings</div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Cost Savings</div>
                   </div>
                 </div>
 
                 {/* Recommendations */}
                 <div>
-                  <h4 className="font-semibold text-gray-900 mb-4">
-                    Recommended Infrastructure
+                  <h4 className="font-bold text-gray-900 gap-2 mb-6 text-lg flex items-center space-x-2">
+                    <span className="w-3 h-3 bg-purple-600 rounded-full"></span>
+                    <span>Recommended Infrastructure</span>
                   </h4>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     {optimizationResults.recommendations.map((rec, index) => (
                       <div
                         key={index}
-                        className="p-4 border border-gray-200 rounded-lg"
+                        className="p-6 border-1 border-gray-200 rounded-xl hover:border-blue-300 hover:shadow-lg transition-all duration-300 bg-gradient-to-r from-white to-gray-50"
                       >
-                        <div className="flex items-start space-x-3">
-                          <MapPinIcon className="h-5 w-5 text-blue-600 mt-1" />
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <h5 className="font-medium text-gray-900">
+                        <div className="flex gap-2 items-start space-x-4">
+                          <div className="p-3 bg-blue-100 rounded-xl">
+                            <MapPinIcon className="h-6 w-6 text-blue-600" />
+                          </div>
+                          <div className="flex-1 space-y-4">
+                            <div className="flex items-center justify-between">
+                              <h5 className="font-bold text-gray-900 text-lg">
                                 {rec.type}
                               </h5>
-                              <span className="text-sm font-medium text-green-600">
+                              <span className="text-lg font-bold mb-2 text-green-600 bg-green-100 px-4 py-2 rounded-lg">
                                 {rec.cost}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 mb-1">
-                              <span className="font-medium">Location:</span>{" "}
-                              {rec.location}
-                            </p>
-                            {rec.capacity && (
-                              <p className="text-sm text-gray-600 mb-1">
-                                <span className="font-medium">Capacity:</span>{" "}
-                                {rec.capacity}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="bg-white p-4 rounded-lg border border-gray-200">
+                                <p className="text-sm text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                                  Location
+                                </p>
+                                <p className="text-gray-800 font-semibold">
+                                  {rec.location}
+                                </p>
+                              </div>
+                              {rec.capacity && (
+                                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                                  <p className="text-sm text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                                    Capacity
+                                  </p>
+                                  <p className="text-gray-800 font-semibold">
+                                    {rec.capacity}
+                                  </p>
+                                </div>
+                              )}
+                              {rec.length && (
+                                <div className="bg-white p-4 rounded-lg border border-gray-200">
+                                  <p className="text-sm text-gray-500 mb-1 font-medium uppercase tracking-wide">
+                                    Length
+                                  </p>
+                                  <p className="text-gray-800 font-semibold">
+                                    {rec.length}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                            <div className="bg-blue-50 p-4 mt-3 rounded-lg border-l-4 border-blue-400">
+                              <p className="text-sm font-medium text-blue-800 italic">
+                                💡 {rec.reason}
                               </p>
-                            )}
-                            {rec.length && (
-                              <p className="text-sm text-gray-600 mb-1">
-                                <span className="font-medium">Length:</span>{" "}
-                                {rec.length}
-                              </p>
-                            )}
-                            <p className="text-sm text-gray-500 italic">
-                              {rec.reason}
-                            </p>
+                            </div>
                           </div>
                         </div>
                       </div>

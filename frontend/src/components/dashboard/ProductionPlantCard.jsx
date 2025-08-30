@@ -18,7 +18,7 @@ const ProductionPlantCard = ({ plant }) => {
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-6 border border-gray-200">
       <div className="flex items-start justify-between">
-        <div className="flex items-center space-x-3">
+        <div className="flex gap-2 items-center space-x-3">
           <div className="p-2 bg-green-100 rounded-lg">
             <BuildingOffice2Icon className="h-6 w-6 text-green-600" />
           </div>
