@@ -207,6 +207,12 @@ const InfrastructureMap = () => {
                   zoom={3}
                   style={{ height: "100%", width: "100%" }}
                   className="rounded-xl"
+                  zoomControl={true}
+                  scrollWheelZoom={true}
+                  doubleClickZoom={true}
+                  touchZoom={true}
+                  boxZoom={true}
+                  keyboard={true}
                 >
                   <TileLayer
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

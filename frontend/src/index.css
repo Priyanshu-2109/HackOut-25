@@ -194,3 +194,28 @@ input[type="range"]::-webkit-slider-thumb:hover {
   border-radius: 8px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
+
+/* Leaflet map z-index fix */
+.leaflet-container {
+  z-index: 1 !important;
+}
+
+.leaflet-control-container {
+  z-index: 5 !important;
+}
+
+.leaflet-popup {
+  z-index: 10 !important;
+}
+
+/* Ensure navbar stays on top */
+nav {
+  position: relative;
+  z-index: 1000 !important;
+}
+
+/* Map container positioning */
+.map-container {
+  position: relative;
+  z-index: 1;
+}
