@@ -24,18 +24,6 @@ const userSchema = new mongoose.Schema(
       trim: true,
       validate: [validator.isEmail, "Email format is invalid"],
     },
-    phone: {
-      type: String,
-      unique: true,
-      sparse: true,
-      trim: true,
-      validate: {
-        validator: function (value) {
-          return /^[0-9]{10}$/.test(value);
-        },
-        message: "Phone number must be exactly 10 digits",
-      },
-    },
     password: {
       type: String,
     },
