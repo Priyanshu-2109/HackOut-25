@@ -9,7 +9,7 @@ import {
   resetPassword,
   verifyEmail,
   logoutAll,
-  googleAuth
+  googleAuth,
 } from "../controllers/authController.js";
 import { verifyJWT } from "../middlewares/authMiddleware.js";
 import { body } from "express-validator";
@@ -25,8 +25,15 @@ router.post(
 );
 router.post(
   "/login",
-  body("email").isEmail(),
+  body("username").optional().isString().trim(),
+  body("email").optional().isEmail().normalizeEmail(),
   body("password").isString().isLength({ min: 8, max: 100 }),
+  body().custom((value, { req }) => {
+    if (!req.body.username && !req.body.email) {
+      throw new Error("Either username or email is required");
+    }
+    return true;
+  }),
   login
 );
 router.get("/me", verifyJWT, getProfile);

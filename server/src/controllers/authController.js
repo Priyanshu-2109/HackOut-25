@@ -311,7 +311,13 @@ export const forgotPassword = asyncHandler(async (req, res) => {
     `Your password reset token: ${resetToken}`
   );
 
-  res.status(200).json(new ApiResponse(200, null, "Password reset email sent"));
+  // In development, also return token in response for testing
+  const responseData =
+    process.env.NODE_ENV === "production" ? null : { resetToken };
+
+  res
+    .status(200)
+    .json(new ApiResponse(200, responseData, "Password reset email sent"));
 });
 
 export const resetPassword = asyncHandler(async (req, res) => {
