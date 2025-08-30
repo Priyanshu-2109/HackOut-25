@@ -6,7 +6,6 @@ import morgan from "morgan";
 import cookieParser from "cookie-parser";
 import csrf from "csurf";
 import rateLimit from "express-rate-limit";
-import { clerkMiddleware } from "@clerk/express";
 
 import connectDB from "./src/config/db.js";
 import logger from "./src/config/logger.js";
@@ -53,7 +52,7 @@ app.use(
     origin: process.env.CORS_ORIGIN,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-CSRF-Token"],
   })
 );
 
@@ -69,16 +68,32 @@ app.use(limiter);
 // --- Other Middleware ---
 app.use(morgan("dev"));
 app.use(cookieParser());
-app.use(clerkMiddleware());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// CSRF protection (only for state-changing routes)
+// CSRF protection (only for state-changing routes and in production)
 const csrfProtection = csrf({ cookie: true });
 app.use((req, res, next) => {
   if (["GET", "HEAD", "OPTIONS"].includes(req.method)) return next();
+
+  // Skip CSRF in development mode
+  if (process.env.NODE_ENV !== "production") {
+    return next();
+  }
+
   csrfProtection(req, res, next);
+});
+
+// CSRF token endpoint (only needed in production)
+app.get("/api/csrf-token", (req, res) => {
+  if (process.env.NODE_ENV === "production") {
+    csrfProtection(req, res, () => {
+      res.json({ csrfToken: req.csrfToken() });
+    });
+  } else {
+    res.json({ csrfToken: "dev-mode-no-csrf" });
+  }
 });
 
 // --- Routes ---

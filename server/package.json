@@ -17,7 +17,6 @@
   "license": "ISC",
   "description": "Backend server combining Node.js/Express, MongoDB, and Python optimization services.",
   "dependencies": {
-    "@clerk/express": "^1.7.26",
     "@sentry/node": "^10.8.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
