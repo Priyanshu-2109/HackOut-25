@@ -15,8 +15,9 @@
   },
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Backend server combining Node.js/Express, MongoDB, and Python optimization services.",
   "dependencies": {
+    "@clerk/express": "^1.7.26",
     "@sentry/node": "^10.8.0",
     "axios": "^1.11.0",
     "bcrypt": "^6.0.0",
@@ -36,7 +37,6 @@
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1",
     "nodemailer": "^7.0.5",
-    "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "pg": "^8.16.3",
