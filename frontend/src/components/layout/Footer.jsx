@@ -9,15 +9,15 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Section */}
           <div className="col-span-1 md:col-span-2">
-            <div className="flex items-center space-x-3 mb-4">
+            <div className="flex items-center space-x-3 mb-2">
               <Logo className="h-8 w-8" />
-              <span className="text-xl font-bold">GreenInfra</span>
+              <span className="text-xl font-bold mx-2">GreenInfra</span>
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
               Leading the future of sustainable energy infrastructure with
               innovative solutions for businesses worldwide.
             </p>
-            <div className="flex space-x-4">
+            <div className="flex gap-3 space-x-3">
               {/* Social Links */}
               <a
                 href="#"
@@ -78,7 +78,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/infrastructure-map"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Infrastructure Mapping
                 </Link>
@@ -86,7 +86,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/optimization"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   System Optimization
                 </Link>
@@ -94,7 +94,7 @@ const Footer = () => {
               <li>
                 <Link
                   to="/analytics"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Analytics & Reports
                 </Link>
@@ -111,7 +111,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Documentation
                 </a>
@@ -119,7 +119,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Contact Us
                 </a>
@@ -127,7 +127,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Privacy Policy
                 </a>
@@ -135,7 +135,7 @@ const Footer = () => {
               <li>
                 <a
                   href="#"
-                  className="text-gray-300 hover:text-green-400 transition-colors"
+                  className="text-gray-300 hover:text-green-400 transition-colors no-underline"
                 >
                   Terms of Service
                 </a>
