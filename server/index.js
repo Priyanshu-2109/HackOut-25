@@ -24,6 +24,8 @@ import projectRoutes from "./src/routes/projectRoutes.js";
 import optimizationLogRoutes from "./src/routes/optimizationLogRoutes.js";
 import postgisRoutes from "./src/routes/postgisRoutes.js";
 import favoriteRoutes from "./src/routes/favoriteRoutes.js";
+import analyticsRoutes from "./src/routes/analyticsRoutes.js";
+import adminRoutes from "./src/routes/adminRoutes.js";
 import { swaggerUi, swaggerSpec } from "./src/config/swagger.js";
 
 dotenv.config({ path: "./.env" });
@@ -110,11 +112,59 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/favorites", favoriteRoutes);
 app.use("/api/optimization-logs", optimizationLogRoutes);
 app.use("/api/postgis", postgisRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// Health check
+// --- Health check ---
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: Date.now() });
+});
+
+// --- Global Error Handler ---
+app.use((err, req, res, next) => {
+  let error = { ...err };
+  error.message = err.message;
+
+  // Log error
+  logger.error(`${err.message}: ${JSON.stringify(req.body)}`);
+  console.error(err);
+
+  // Mongoose bad ObjectId
+  if (err.name === "CastError") {
+    const message = "Resource not found";
+    error = { message, statusCode: 404 };
+  }
+
+  // Mongoose duplicate key
+  if (err.code === 11000) {
+    const message = "Duplicate field value entered";
+    error = { message, statusCode: 400 };
+  }
+
+  // Mongoose validation error
+  if (err.name === "ValidationError") {
+    const message = Object.values(err.errors)
+      .map((val) => val.message)
+      .join(", ");
+    error = { message, statusCode: 400 };
+  }
+
+  // JWT errors
+  if (err.name === "JsonWebTokenError") {
+    const message = "Invalid token";
+    error = { message, statusCode: 401 };
+  }
+
+  if (err.name === "TokenExpiredError") {
+    const message = "Token expired";
+    error = { message, statusCode: 401 };
+  }
+
+  res.status(error.statusCode || 500).json({
+    success: false,
+    error: error.message || "Server Error",
+  });
 });
 
 // --- Start Server ---

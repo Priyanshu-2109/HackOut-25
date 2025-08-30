@@ -1,7 +1,14 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/authMiddleware.js";
-import { optimizeSystem } from "../controllers/systemController.js";
+import {
+  getSystemHealth,
+  getSystemStatus,
+} from "../controllers/systemController.js";
 
 const router = Router();
-router.post("/optimize", verifyJWT, optimizeSystem);
+
+// System health and status endpoints
+router.get("/health", getSystemHealth);
+router.get("/status", verifyJWT, getSystemStatus);
+
 export default router;

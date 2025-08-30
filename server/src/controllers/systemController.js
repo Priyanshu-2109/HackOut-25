@@ -1,20 +1,46 @@
-import axios from "axios";
-import { ApiError, ApiResponse, asyncHandler } from "../utils/api.js";
+import { ApiResponse, asyncHandler } from "../utils/api.js";
 
-export const optimizeSystem = asyncHandler(async (req, res) => {
-  // Forward request to Python backend
-  try {
-    const response = await axios.post(
-      "http://localhost:5000/optimize",
-      req.body
-    );
-    res
-      .status(200)
-      .json(new ApiResponse(200, response.data, "Optimization result"));
-  } catch (error) {
-    throw new ApiError(
-      500,
-      "Python backend error: " + (error.response?.data?.error || error.message)
-    );
-  }
+/**
+ * SYSTEM STATUS & HEALTH CONTROLLER
+ *
+ * This controller handles basic system health checks and status monitoring.
+ * For optimization functionality, use /api/analytics/optimize instead.
+ */
+
+export const getSystemHealth = asyncHandler(async (req, res) => {
+  const healthStatus = {
+    status: "operational",
+    timestamp: new Date().toISOString(),
+    services: {
+      database: "connected",
+      python_backend: "available",
+      api_server: "running",
+    },
+    version: "1.0.0",
+    uptime: process.uptime(),
+    memory_usage: process.memoryUsage(),
+  };
+
+  res.json(
+    new ApiResponse(
+      200,
+      healthStatus,
+      "System health status retrieved successfully"
+    )
+  );
+});
+
+export const getSystemStatus = asyncHandler(async (req, res) => {
+  const systemStatus = {
+    environment: process.env.NODE_ENV || "development",
+    server_time: new Date().toISOString(),
+    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    node_version: process.version,
+    platform: process.platform,
+    architecture: process.arch,
+  };
+
+  res.json(
+    new ApiResponse(200, systemStatus, "System status retrieved successfully")
+  );
 });

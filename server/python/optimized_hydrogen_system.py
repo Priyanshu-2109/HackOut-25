@@ -45,6 +45,16 @@ class Recommendation:
     reasons: List[str]
 
 class OptimizedHydrogenSystem:
+    """High-performance hydrogen infrastructure optimizer"""
+    
+    def __init__(self):
+        self.plants: List[Asset] = []
+        self.storages: List[Asset] = []
+        self.pipelines: List[Asset] = []
+        self.regulatory_zones: List[Dict] = []
+        self.cost_model: Dict[str, float] = {}
+        self._initialized = False
+
     def ingest_assets_from_file(self, filepath: str, filetype: str = 'geojson') -> bool:
         """Ingest asset data from GeoJSON or CSV file using GeoPandas or Pandas."""
         try:
@@ -94,7 +104,6 @@ class OptimizedHydrogenSystem:
         except Exception as e:
             print(f"DB ingestion error: {e}")
             return False
-    """High-performance hydrogen infrastructure optimizer"""
     
     def __init__(self):
         self.plants: List[Asset] = []
