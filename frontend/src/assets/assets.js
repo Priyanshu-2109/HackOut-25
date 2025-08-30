@@ -2,9 +2,9 @@
 
 // Dummy data for authentication
 export const dummyUser = {
-  username: "user123",
-  password: "password",
-  email: "user@greenhydrogen.com",
+  username: "admin",
+  password: "admin",
+  email: "admin@hydrogrid.com",
 };
 
 // Infrastructure data with geospatial coordinates
@@ -213,50 +213,46 @@ export const costAnalysis = {
   total: { current: "$435M", optimized: "$356M", savings: "18%" },
 };
 
-// Features data for home page - updated for mapping focus
+// Features data for home page - updated for sustainable energy focus
 export const features = [
   {
     id: 1,
-    title: "Infrastructure Mapping",
+    title: "Trusted Advisor",
     description:
-      "Visualize existing hydrogen production plants, storage facilities, and pipeline networks on interactive maps with real-time data.",
+      "Our independent expert advice and specialist knowledge help you make the best energy decisions for your business.",
     icon: "map",
     benefits: [
-      "Real-time visualization",
-      "Geospatial analysis",
-      "Asset tracking",
+      "Expert consultation",
+      "Independent advice",
+      "Specialist knowledge",
     ],
   },
   {
     id: 2,
-    title: "Smart Optimization",
+    title: "Client Focused",
     description:
-      "AI-powered algorithms optimize facility placement and pipeline routing for maximum efficiency, cost reduction, and sustainability.",
+      "We are committed to client helping you reduce energy costs and become more profitable with tailor-made energy solutions.",
     icon: "optimization",
-    benefits: [
-      "Cost minimization",
-      "Efficiency maximization",
-      "Route optimization",
-    ],
+    benefits: ["Cost reduction", "Profit maximization", "Custom solutions"],
   },
   {
     id: 3,
-    title: "Decision Analytics",
+    title: "Innovative & Productive",
     description:
-      "Advanced analytics and simulation tools help stakeholders make data-driven decisions for infrastructure scaling and investment.",
+      "We help clients in new and innovative ways of improving energy efficiency and growth with sustainable solutions.",
     icon: "analytics",
-    benefits: ["Scenario modeling", "Investment analysis", "Risk assessment"],
+    benefits: ["Innovation", "Efficiency improvement", "Sustainable growth"],
   },
   {
     id: 4,
-    title: "Sustainability Focus",
+    title: "Trusted Advisor",
     description:
-      "Environmental impact assessment and carbon footprint optimization ensure sustainable green hydrogen infrastructure development.",
+      "Our Business & Network's specialized energy team focusing on strategic planning and profitable energy strategy.",
     icon: "sustainability",
     benefits: [
-      "Carbon tracking",
-      "Environmental impact",
-      "Sustainability metrics",
+      "Strategic planning",
+      "Network optimization",
+      "Profitable strategies",
     ],
   },
 ];

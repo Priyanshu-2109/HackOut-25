@@ -16,9 +16,18 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const login = (username, password) => {
-    if (username === dummyUser.username && password === dummyUser.password) {
+    // Accept any credentials for development (non-empty username and password)
+    if (
+      username &&
+      password &&
+      username.trim() !== "" &&
+      password.trim() !== ""
+    ) {
       setIsAuthenticated(true);
-      setUser({ username: dummyUser.username, email: dummyUser.email });
+      setUser({
+        username: username,
+        email: username.includes("@") ? username : `${username}@hydrogrid.com`,
+      });
       return true;
     }
     return false;

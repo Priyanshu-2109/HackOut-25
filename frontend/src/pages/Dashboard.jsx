@@ -50,7 +50,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-green-50 pt-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
@@ -58,7 +58,7 @@ const Dashboard = () => {
             Welcome back, {user?.username}!
           </h1>
           <p className="text-gray-600 mt-2">
-            Here's an overview of your Green Hydrogen infrastructure
+            Here's an overview of your sustainable energy infrastructure
           </p>
         </div>
 
@@ -67,7 +67,7 @@ const Dashboard = () => {
           {stats.map((stat, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
+              className="bg-white rounded-xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition-shadow duration-300"
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -79,7 +79,7 @@ const Dashboard = () => {
                   </p>
                   <p className="text-xs text-green-600 mt-1">{stat.change}</p>
                 </div>
-                <div className={`p-3 rounded-lg ${stat.color}`}>
+                <div className={`p-3 rounded-xl ${stat.color} shadow-lg`}>
                   <stat.icon className="h-6 w-6 text-white" />
                 </div>
               </div>
@@ -140,29 +140,33 @@ const Dashboard = () => {
         </section>
 
         {/* Quick Actions */}
-        <section className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <section className="bg-white rounded-xl shadow-lg p-8 border border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6">
             Quick Actions
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-              <h4 className="font-medium text-gray-900 mb-1">Add New Plant</h4>
-              <p className="text-sm text-gray-600">
-                Register a new production facility
-              </p>
-            </button>
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-              <h4 className="font-medium text-gray-900 mb-1">Plan Pipeline</h4>
-              <p className="text-sm text-gray-600">
-                Design optimal pipeline routes
-              </p>
-            </button>
-            <button className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors duration-200 text-left">
-              <h4 className="font-medium text-gray-900 mb-1">
-                Optimize Storage
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <button className="p-6 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all duration-200 text-left group">
+              <h4 className="font-medium text-gray-900 mb-2 group-hover:text-green-700">
+                Add New Facility
               </h4>
               <p className="text-sm text-gray-600">
-                Analyze storage capacity needs
+                Register a new sustainable energy facility
+              </p>
+            </button>
+            <button className="p-6 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all duration-200 text-left group">
+              <h4 className="font-medium text-gray-900 mb-2 group-hover:text-green-700">
+                Optimize Systems
+              </h4>
+              <p className="text-sm text-gray-600">
+                Analyze and improve energy efficiency
+              </p>
+            </button>
+            <button className="p-6 border border-gray-200 rounded-xl hover:border-green-300 hover:bg-green-50 transition-all duration-200 text-left group">
+              <h4 className="font-medium text-gray-900 mb-2 group-hover:text-green-700">
+                View Analytics
+              </h4>
+              <p className="text-sm text-gray-600">
+                Monitor performance and trends
               </p>
             </button>
           </div>
