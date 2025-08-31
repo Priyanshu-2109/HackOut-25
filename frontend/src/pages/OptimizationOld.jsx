@@ -42,6 +42,42 @@ const Optimization = () => {
     localStorage.setItem('optimizationParams', JSON.stringify(optimizationParams));
   }, [optimizationParams]);
 
+  const handleOptimize = async () => {
+    setIsOptimizing(true);
+
+    // Generate dynamic results based on localStorage data
+    setTimeout(() => {
+      const results = {
+        timestamp: new Date().toISOString(),
+        parameters: { ...optimizationParams },
+        newPlants: Math.floor(Math.random() * 5) + 1,
+        newPipelines: Math.floor(Math.random() * 4) + 1,
+        newStorage: Math.floor(Math.random() * 3) + 1,
+        costSavings: `${Math.floor(Math.random() * 25) + 10}%`,
+        efficiencyGain: `${Math.floor(Math.random() * 30) + 15}%`,
+        recommendations: generateRecommendations(optimizationParams),
+      };
+      
+      setOptimizationResults(results);
+      localStorage.setItem('optimizationResults', JSON.stringify(results));
+      
+      // Save configuration to history
+      const newConfig = {
+        id: Date.now(),
+        name: `Configuration ${savedConfigurations.length + 1}`,
+        params: { ...optimizationParams },
+        results: results,
+        createdAt: new Date().toISOString()
+      };
+      
+      const updatedConfigs = [...savedConfigurations, newConfig];
+      setSavedConfigurations(updatedConfigs);
+      localStorage.setItem('savedConfigurations', JSON.stringify(updatedConfigs));
+      
+      setIsOptimizing(false);
+    }, 3000);
+  };
+
   const generateRecommendations = (params) => {
     const recommendations = [];
     const regions = {
@@ -78,49 +114,6 @@ const Optimization = () => {
     return reasonList[Math.floor(Math.random() * reasonList.length)];
   };
 
-  const handleOptimize = async () => {
-    console.log('🔍 Starting optimization process...', optimizationParams);
-    setIsOptimizing(true);
-
-    // Generate dynamic results based on localStorage data
-    setTimeout(() => {
-      try {
-        const results = {
-          timestamp: new Date().toISOString(),
-          parameters: { ...optimizationParams },
-          newPlants: Math.floor(Math.random() * 5) + 1,
-          newPipelines: Math.floor(Math.random() * 4) + 1,
-          newStorage: Math.floor(Math.random() * 3) + 1,
-          costSavings: `${Math.floor(Math.random() * 25) + 10}%`,
-          efficiencyGain: `${Math.floor(Math.random() * 30) + 15}%`,
-          recommendations: generateRecommendations(optimizationParams),
-        };
-        
-        setOptimizationResults(results);
-        localStorage.setItem('optimizationResults', JSON.stringify(results));
-        console.log('✅ Optimization completed successfully:', results);
-        
-        // Save configuration to history
-        const newConfig = {
-          id: Date.now(),
-          name: `Configuration ${savedConfigurations.length + 1}`,
-          params: { ...optimizationParams },
-          results: results,
-          createdAt: new Date().toISOString()
-        };
-        
-        const updatedConfigs = [...savedConfigurations, newConfig];
-        setSavedConfigurations(updatedConfigs);
-        localStorage.setItem('savedConfigurations', JSON.stringify(updatedConfigs));
-        
-      } catch (error) {
-        console.error('❌ Error during optimization:', error);
-      } finally {
-        setIsOptimizing(false);
-      }
-    }, 3000);
-  };
-
   const handleParamChange = (param, value) => {
     setOptimizationParams((prev) => ({
       ...prev,
@@ -130,6 +123,27 @@ const Optimization = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
+      <style jsx>{`
+        .slider::-webkit-slider-thumb {
+          appearance: none;
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+        .slider::-moz-range-thumb {
+          height: 20px;
+          width: 20px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+          cursor: pointer;
+          border: 2px solid white;
+          box-shadow: 0 4px 8px rgba(59, 130, 246, 0.3);
+        }
+      `}</style>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <motion.div
@@ -142,7 +156,7 @@ const Optimization = () => {
             Infrastructure Optimization
           </h1>
           <p className="text-xl text-gray-600">
-            AI-powered optimization for green hydrogen infrastructure planning (Using localStorage)
+            AI-powered optimization for green hydrogen infrastructure planning
           </p>
         </motion.div>
 
@@ -177,7 +191,7 @@ const Optimization = () => {
                       onChange={(e) =>
                         handleParamChange("budget", e.target.value)
                       }
-                      className="w-full h-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full appearance-none cursor-pointer"
+                      className="w-full h-3 bg-gradient-to-r from-blue-100 to-blue-200 rounded-full appearance-none cursor-pointer slider"
                       style={{
                         background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${((optimizationParams.budget - 100) / 900) * 100}%, #e5f3ff ${((optimizationParams.budget - 100) / 900) * 100}%, #e5f3ff 100%)`
                       }}
@@ -202,7 +216,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("timeframe", e.target.value)
                     }
-                    className="w-full px-2 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value={3}>3 Years</option>
                     <option value={5}>5 Years</option>
@@ -221,7 +235,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("priority", e.target.value)
                     }
-                    className="w-full px-2 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value="cost">Cost Minimization</option>
                     <option value="efficiency">Efficiency Maximization</option>
@@ -240,7 +254,7 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("region", e.target.value)
                     }
-                    className="w-full px-2 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
+                    className="w-full px-2 py-2 border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
                     <option value="north-america">North America</option>
                     <option value="europe">Europe</option>
@@ -259,11 +273,15 @@ const Optimization = () => {
                     onChange={(e) =>
                       handleParamChange("demandGrowth", e.target.value)
                     }
-                    className="w-full px-2 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
+                    className="w-full px-2 py-2  border-1 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-800 font-medium transition-all duration-200 hover:border-blue-300"
                   >
-                    <option value="conservative">Conservative (15% annually)</option>
+                    <option value="conservative">
+                      Conservative (15% annually)
+                    </option>
                     <option value="moderate">Moderate (25% annually)</option>
-                    <option value="aggressive">Aggressive (40% annually)</option>
+                    <option value="aggressive">
+                      Aggressive (40% annually)
+                    </option>
                   </select>
                 </div>
 
@@ -292,7 +310,7 @@ const Optimization = () => {
 
           {/* Results Section */}
           <motion.div
-            className="lg:col-span-2 space-y-6"
+            className="lg:col-span-2 space-y-10"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -326,6 +344,10 @@ const Optimization = () => {
                         <div className="flex justify-between">
                           <span>Priority:</span>
                           <span className="font-medium">{config.params.priority}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Region:</span>
+                          <span className="font-medium">{config.params.region}</span>
                         </div>
                       </div>
                     </div>
@@ -375,6 +397,53 @@ const Optimization = () => {
               </div>
             </div>
 
+            {/* Optimization Results */}
+            {optimizationResults && (
+              <motion.div
+                className="bg-white rounded-2xl shadow-xl p-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                <div className="flex items-center gap-2 space-x-3 mb-6">
+                  <ChartBarIcon className="h-7 w-7 text-purple-600" />
+                  <h3 className="text-xl font-bold text-gray-900">
+                    Optimization Results
+                  </h3>
+                </div>
+
+                {/* Summary Stats */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                  <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border-1 border-blue-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-blue-600 mb-2">
+                      {optimizationResults.newPlants}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">New Plants</div>
+                  </div>
+                  <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border-1 border-green-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-green-600 mb-2">
+                      {optimizationResults.newPipelines}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">New Pipelines</div>
+                  </div>
+                  <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border-1 border-purple-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-purple-600 mb-2">
+                      {optimizationResults.newStorage}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                      Storage Facilities
+                    </div>
+                  </div>
+                  <div className="text-center p-6 bg-gradient-to-br from-emerald-50 to-emerald-100 rounded-xl border-1 border-emerald-200 hover:shadow-lg transition-all duration-300">
+                    <div className="text-3xl font-bold text-emerald-600 mb-2">
+                      {optimizationResults.costSavings}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-700 uppercase tracking-wide">Cost Savings</div>
+                  </div>
+                </div>
+
+                {/* Recommendations */}
+                <div>
             {/* Optimization Results */}
             {optimizationResults && (
               <motion.div

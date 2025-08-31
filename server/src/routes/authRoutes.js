@@ -3,6 +3,7 @@ import passport from "passport";
 import {
   register,
   login,
+  logout,
   getProfile,
   updateProfile,
   forgotPassword,
@@ -38,6 +39,7 @@ router.post(
 );
 router.get("/me", verifyJWT, getProfile);
 router.put("/me", verifyJWT, updateProfile);
+router.post("/logout", verifyJWT, logout);
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
 router.post("/verify-email", verifyEmail);
@@ -45,12 +47,10 @@ router.post("/logout-all", verifyJWT, logoutAll);
 router
   .route("/auth/google")
   .get(passport.authenticate("google", { scope: ["profile", "email"] }));
+
 router.route("/auth/google/callback").get(
-  passport.authenticate("google", {
-    failureRedirect: "/login",
-    session: true,
-  }),
-  googleAuth
+  passport.authenticate("google", { failureRedirect: "/" }),
+  (req, res, next) => googleAuth(req, res, next)
 );
 
 export default router;

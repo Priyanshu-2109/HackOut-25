@@ -8,6 +8,9 @@ import csrf from "csurf";
 import rateLimit from "express-rate-limit";
 
 import connectDB from "./src/config/db.js";
+import passport from "passport";
+import "./src/config/passport.js";
+import session from "express-session";
 import logger from "./src/config/logger.js";
 
 // Routers
@@ -74,6 +77,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
+// Minimal session setup for OAuth (no persistent store needed for dev)
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET || "dev-secret",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
 // CSRF protection (only for state-changing routes and in production)
 const csrfProtection = csrf({ cookie: true });
 app.use((req, res, next) => {
@@ -119,6 +134,25 @@ app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // --- Health check ---
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok", timestamp: Date.now() });
+});
+
+// --- Test database connection ---
+app.get("/api/test-db", async (req, res) => {
+  try {
+    const User = (await import("./src/models/authModel.js")).User;
+    const userCount = await User.countDocuments();
+    res.status(200).json({ 
+      status: "Database connected", 
+      userCount: userCount,
+      timestamp: Date.now() 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      status: "Database error", 
+      error: error.message,
+      timestamp: Date.now() 
+    });
+  }
 });
 
 // --- Global Error Handler ---

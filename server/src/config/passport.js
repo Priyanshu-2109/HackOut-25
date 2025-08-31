@@ -7,7 +7,8 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: `${process.env.SERVER_URL}/users/auth/google/callback`,
+  // Ensure API prefix is present
+  callbackURL: `${process.env.SERVER_URL}/api/users/auth/google/callback`,
       scope: ["profile", "email"],
       passReqToCallback: true,
     },

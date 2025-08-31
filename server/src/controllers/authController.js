@@ -413,22 +413,45 @@ export const verifyOTP = asyncHandler(async (req, res) => {
 
 // --- Google Auth ---
 export const googleAuth = async (req, res) => {
-  const { accessToken, refreshToken } = req.cookies;
   const userId = req.user._id;
   const user = await User.findById(userId).select("-password -refreshToken");
   if (!user) throw new ApiError(404, "User does not exist");
 
-  return res
-    .status(200)
+  // Generate fresh tokens for this OAuth login
+  const { accessToken, refreshToken } = await generateAccessAndRefreshToken(
+    userId
+  );
+
+  // Set cookies for same-origin API usage
+  res
     .cookie("accessToken", accessToken, cookieOptions)
-    .cookie("refreshToken", refreshToken, cookieOptions)
-    .json(
-      new ApiResponse(
-        200,
-        { user, accessToken, refreshToken },
-        "Google Login successful"
-      )
-    );
+    .cookie("refreshToken", refreshToken, cookieOptions);
+
+  // Return a tiny HTML page that informs the opener window and closes the popup
+  const payload = {
+    user,
+    accessToken,
+    refreshToken,
+  };
+
+  const html = `<!DOCTYPE html>
+  <html lang="en"><head><meta charset="utf-8"/><title>Signing you in…</title></head>
+  <body style="font-family: sans-serif; display:flex; align-items:center; justify-content:center; height:100vh;">
+    <div>Google sign-in successful. You can close this window.</div>
+    <script>
+      (function(){
+        try {
+          var data = ${JSON.stringify(payload)};
+          if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ type: 'oauth-success', data: data }, '*');
+          }
+        } catch(e) {}
+        setTimeout(function(){ window.close(); }, 300);
+      })();
+    </script>
+  </body></html>`;
+
+  res.status(200).send(html);
 };
 
 // --- Refresh Token ---
