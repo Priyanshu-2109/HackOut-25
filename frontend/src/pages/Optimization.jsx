@@ -142,7 +142,7 @@ const Optimization = () => {
             Infrastructure Optimization
           </h1>
           <p className="text-xl text-gray-600">
-            AI-powered optimization for green hydrogen infrastructure planning (Using localStorage)
+            AI-powered optimization for green hydrogen infrastructure planning 
           </p>
         </motion.div>
 
