@@ -16,6 +16,9 @@ import L from "leaflet";
 import { motion, AnimatePresence } from "framer-motion";
 import { LocalStorageService } from "../utils/localStorageService";
 import AdvancedLocalStorageService from "../utils/advancedLocalStorageService";
+import { comprehensiveLocalStorageService } from "../utils/comprehensiveLocalStorageService";
+import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import {
   MapPinIcon,
   BuildingOffice2Icon,
@@ -40,6 +43,8 @@ import {
   BoltIcon,
   InformationCircleIcon,
   ChartPieIcon,
+  XMarkIcon,
+  CheckIcon,
 } from "@heroicons/react/24/outline";
 import "leaflet/dist/leaflet.css";
 
@@ -89,16 +94,194 @@ const assetIcons = {
 };
 
 // Map click event handler
-function MapEvents({ onMapClick, showingSiteSelection }) {
+function MapEvents({ onMapClick, showingSiteSelection, onAddInfrastructure, addingInfrastructure }) {
   useMapEvents({
     click(e) {
       if (showingSiteSelection) {
         onMapClick(e.latlng);
+      } else if (addingInfrastructure) {
+        onAddInfrastructure(e.latlng);
       }
     },
   });
   return null;
 }
+
+// Add Infrastructure Modal Component
+const AddInfrastructureModal = ({ isOpen, onClose, location, onSave }) => {
+  const [infrastructureType, setInfrastructureType] = useState('plant');
+  const [name, setName] = useState('');
+  const [capacity, setCapacity] = useState('');
+  const [status, setStatus] = useState('Active');
+  const [cost, setCost] = useState('');
+  const [description, setDescription] = useState('');
+  const { user } = useAuth();
+  const { showSuccess, showError } = useToast();
+
+  const handleSave = () => {
+    if (!name || !capacity) {
+      showError('Please fill in all required fields');
+      return;
+    }
+
+    const newInfrastructure = {
+      id: `infrastructure_${Date.now()}`,
+      name,
+      type: infrastructureType,
+      latitude: location.lat,
+      longitude: location.lng,
+      capacity: `${capacity} MW`,
+      status,
+      cost: cost ? `$${cost}M` : 'TBD',
+      description,
+      efficiency: `${(Math.random() * 20 + 80).toFixed(1)}%`,
+      createdBy: user?.name || 'Anonymous',
+      createdAt: new Date().toISOString(),
+      lastUpdated: new Date().toISOString(),
+      isUserAdded: true,
+      coordinates: [location.lat, location.lng]
+    };
+
+    onSave(newInfrastructure);
+    showSuccess('Infrastructure added successfully!');
+    onClose();
+    
+    // Reset form
+    setName('');
+    setCapacity('');
+    setCost('');
+    setDescription('');
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6"
+      >
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Add New Infrastructure</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-600"
+          >
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Infrastructure Type *
+            </label>
+            <select
+              value={infrastructureType}
+              onChange={(e) => setInfrastructureType(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="plant">Hydrogen Production Plant</option>
+              <option value="storage">Storage Facility</option>
+              <option value="pipeline">Pipeline Network</option>
+              <option value="renewable">Renewable Energy Source</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Name *
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter infrastructure name"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Capacity (MW) *
+            </label>
+            <input
+              type="number"
+              value={capacity}
+              onChange={(e) => setCapacity(e.target.value)}
+              placeholder="Enter capacity"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Status
+            </label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            >
+              <option value="Active">Active</option>
+              <option value="Under Construction">Under Construction</option>
+              <option value="Planned">Planned</option>
+              <option value="Maintenance">Maintenance</option>
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Estimated Cost (Million $)
+            </label>
+            <input
+              type="number"
+              value={cost}
+              onChange={(e) => setCost(e.target.value)}
+              placeholder="Enter estimated cost"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Description
+            </label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Enter description"
+              rows={3}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+
+          <div className="text-xs text-gray-500">
+            Location: {location.lat.toFixed(4)}, {location.lng.toFixed(4)}
+          </div>
+        </div>
+
+        <div className="flex space-x-3 mt-6">
+          <button
+            onClick={onClose}
+            className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={handleSave}
+            className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center justify-center"
+          >
+            <CheckIcon className="h-4 w-4 mr-2" />
+            Add Infrastructure
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
 
 const InfrastructureMapping = () => {
   const [infrastructureData, setInfrastructureData] = useState(null);
@@ -112,6 +295,16 @@ const InfrastructureMapping = () => {
   const [activeTab, setActiveTab] = useState('infrastructure');
   const [showAdvancedPanel, setShowAdvancedPanel] = useState(false);
   const mapRef = useRef(null);
+
+  // New state for infrastructure management
+  const [addingInfrastructure, setAddingInfrastructure] = useState(false);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newInfrastructureLocation, setNewInfrastructureLocation] = useState(null);
+  const [userInfrastructure, setUserInfrastructure] = useState([]);
+  const [collaborativeInfrastructure, setCollaborativeInfrastructure] = useState([]);
+
+  const { user } = useAuth();
+  const { showSuccess, showError, showWarning } = useToast();
 
   // Enhanced state management
   const [renewableSources, setRenewableSources] = useState([]);
@@ -200,32 +393,14 @@ const InfrastructureMapping = () => {
     setLoading(true);
     
     try {
-      // Perform comprehensive site analysis using enhanced service
-      const siteEvaluation = comprehensiveLocalStorageService.evaluateSite(
-        [latlng.lat, latlng.lng], 
-        {
-          proximityWeight: 0.3,
-          regulatoryWeight: 0.2,
-          environmentalWeight: 0.2,
-          economicWeight: 0.3
-        }
-      );
+      // Perform comprehensive site analysis
+      const analysis = AdvancedLocalStorageService.performSiteAnalysis([latlng.lat, latlng.lng]);
+      setRecommendations(analysis.recommendations);
+      setSelectedAsset(analysis);
       
-      setSelectedAsset(siteEvaluation);
-      setRecommendations(siteEvaluation.recommendations);
-      
-      // Add to site evaluations history
+      // Update site evaluations list
       const updatedEvaluations = AdvancedLocalStorageService.getSiteEvaluations();
-      updatedEvaluations.push({
-        ...siteEvaluation,
-        id: `eval_${Date.now()}`,
-        timestamp: new Date().toISOString()
-      });
-      
-      AdvancedLocalStorageService.setSiteEvaluations(updatedEvaluations);
       setSiteEvaluations(updatedEvaluations);
-      
-      console.log('🌱 Enhanced site evaluation completed:', siteEvaluation);
       
     } catch (error) {
       console.error('Error analyzing site:', error);
@@ -237,6 +412,109 @@ const InfrastructureMapping = () => {
       }]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle adding new infrastructure to the map
+  const handleAddInfrastructure = (latlng) => {
+    setNewInfrastructureLocation(latlng);
+    setShowAddModal(true);
+    setAddingInfrastructure(false);
+  };
+
+  // Save new infrastructure
+  const handleSaveInfrastructure = (newInfrastructure) => {
+    try {
+      // Save to comprehensive local storage
+      const storageKey = 
+        newInfrastructure.type === 'plant' ? 'hydrogrid_production_plants' :
+        newInfrastructure.type === 'storage' ? 'hydrogrid_storage_facilities' :
+        newInfrastructure.type === 'pipeline' ? 'hydrogrid_pipeline_networks' :
+        'hydrogrid_renewable_sources';
+
+      const existingData = comprehensiveLocalStorageService.getItem(storageKey) || [];
+      const updatedData = [...existingData, newInfrastructure];
+      comprehensiveLocalStorageService.setItem(storageKey, updatedData);
+
+      // Also save to user infrastructure list
+      const userInfraList = comprehensiveLocalStorageService.getItem('user_infrastructure') || [];
+      userInfraList.push(newInfrastructure);
+      comprehensiveLocalStorageService.setItem('user_infrastructure', userInfraList);
+      setUserInfrastructure(userInfraList);
+
+      // Simulate collaborative feature - randomly add infrastructure from "other users"
+      simulateCollaborativeInfrastructure();
+
+      // Refresh the map data
+      refreshMapData();
+      
+      console.log('🏭 New infrastructure added:', newInfrastructure);
+    } catch (error) {
+      console.error('❌ Error saving infrastructure:', error);
+      showError('Failed to save infrastructure');
+    }
+  };
+
+  // Simulate collaborative infrastructure from other users
+  const simulateCollaborativeInfrastructure = () => {
+    const collaborativeData = comprehensiveLocalStorageService.getItem('collaborative_infrastructure') || [];
+    
+    // Add random infrastructure from "other users" occasionally
+    if (Math.random() > 0.7) {
+      const randomInfrastructure = {
+        id: `collab_${Date.now()}`,
+        name: `Community ${['Hydrogen Hub', 'Solar Plant', 'Wind Farm'][Math.floor(Math.random() * 3)]}`,
+        type: ['plant', 'storage', 'renewable'][Math.floor(Math.random() * 3)],
+        latitude: 39.8283 + (Math.random() - 0.5) * 10,
+        longitude: -98.5795 + (Math.random() - 0.5) * 20,
+        capacity: `${(Math.random() * 100 + 50).toFixed(0)} MW`,
+        status: 'Active',
+        cost: `$${(Math.random() * 5 + 1).toFixed(1)}M`,
+        createdBy: ['Alice Johnson', 'Bob Smith', 'Carol Williams', 'David Brown'][Math.floor(Math.random() * 4)],
+        createdAt: new Date().toISOString(),
+        isCollaborative: true,
+        efficiency: `${(Math.random() * 20 + 80).toFixed(1)}%`
+      };
+
+      collaborativeData.push(randomInfrastructure);
+      comprehensiveLocalStorageService.setItem('collaborative_infrastructure', collaborativeData);
+      setCollaborativeInfrastructure(collaborativeData);
+      
+      showSuccess(`New infrastructure added by ${randomInfrastructure.createdBy}!`);
+    }
+  };
+
+  // Refresh map data
+  const refreshMapData = () => {
+    const data = comprehensiveLocalStorageService.getComprehensiveDashboardData();
+    setInfrastructureData(data.infrastructure);
+  };
+
+  // Load user and collaborative infrastructure
+  useEffect(() => {
+    const userInfraList = comprehensiveLocalStorageService.getItem('user_infrastructure') || [];
+    const collabInfraList = comprehensiveLocalStorageService.getItem('collaborative_infrastructure') || [];
+    setUserInfrastructure(userInfraList);
+    setCollaborativeInfrastructure(collabInfraList);
+
+    // Set up periodic updates to simulate real-time collaboration
+    const interval = setInterval(() => {
+      if (Math.random() > 0.8) { // 20% chance every 30 seconds
+        simulateCollaborativeInfrastructure();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Toggle add infrastructure mode
+  const toggleAddInfrastructure = () => {
+    setAddingInfrastructure(!addingInfrastructure);
+    setSiteSelectionMode(false);
+    if (addingInfrastructure) {
+      showWarning('Infrastructure adding mode disabled');
+    } else {
+      showSuccess('Click on the map to add new infrastructure');
     }
   };
 
@@ -316,6 +594,16 @@ const InfrastructureMapping = () => {
             </div>
             <div className="flex space-x-3">
               <button
+                onClick={toggleAddInfrastructure}
+                className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
+                  addingInfrastructure ? 'bg-green-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-green-50'
+                }`}
+                title="Add new infrastructure to the map"
+              >
+                <PlusIcon className="h-5 w-5 mr-2" />
+                {addingInfrastructure ? 'Cancel Add' : 'Add Infrastructure'}
+              </button>
+              <button
                 onClick={() => setShowAdvancedPanel(!showAdvancedPanel)}
                 className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
                   showAdvancedPanel ? 'bg-purple-600 text-white' : 'bg-white text-gray-700 border border-gray-300'
@@ -335,16 +623,13 @@ const InfrastructureMapping = () => {
               </button>
               <button
                 onClick={() => {
-                  console.log(`🔍 ${siteSelectionMode ? 'Exiting' : 'Entering'} site analysis mode...`);
                   setSiteSelectionMode(!siteSelectionMode);
                   setSelectedLocation(null);
                   setRecommendations([]);
-                  console.log('✅ Site analysis mode toggled');
                 }}
                 className={`flex items-center px-4 py-2 rounded-lg transition-colors ${
                   siteSelectionMode ? 'bg-green-600 text-white' : 'bg-white text-gray-700 border border-gray-300'
                 }`}
-                title={siteSelectionMode ? 'Exit site analysis mode' : 'Enter site analysis mode'}
               >
                 <MagnifyingGlassIcon className="h-4 w-4 mr-2" />
                 {siteSelectionMode ? 'Exit Analysis Mode' : 'Site Analysis Mode'}
@@ -644,38 +929,30 @@ const InfrastructureMapping = () => {
                     <h4 className="text-sm font-medium text-gray-700 mb-3">Quick Actions</h4>
                     <div className="space-y-2">
                       <button
-                        onClick={() => {
-                          console.log('🔄 Showing all infrastructure...');
-                          setFilters({
-                            showPlants: true,
-                            showStorage: true,
-                            showPipelines: true,
-                            showRenewable: true,
-                            showDemand: true,
-                            showZones: true,
-                            showEvaluations: false,
-                            plantStatus: 'all',
-                            storageUtilization: 'all',
-                            renewableType: 'all',
-                            demandType: 'all',
-                            zoneType: 'all'
-                          });
-                          console.log('✅ All infrastructure filters applied');
-                        }}
-                        className="w-full px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors font-medium"
-                        title="Show all infrastructure on the map"
+                        onClick={() => setFilters({
+                          showPlants: true,
+                          showStorage: true,
+                          showPipelines: true,
+                          showRenewable: true,
+                          showDemand: true,
+                          showZones: true,
+                          showEvaluations: false,
+                          plantStatus: 'all',
+                          storageUtilization: 'all',
+                          renewableType: 'all',
+                          demandType: 'all',
+                          zoneType: 'all'
+                        })}
+                        className="w-full px-3 py-2 text-sm bg-blue-50 text-blue-600 rounded-md hover:bg-blue-100 transition-colors"
                       >
-                        🏭 Show All Infrastructure
+                        Show All Infrastructure
                       </button>
                       <button
                         onClick={() => {
-                          console.log('📊 Switching to analytics view...');
                           setFilters({...filters, showEvaluations: true});
                           setActiveTab('analytics');
-                          console.log('✅ Analytics view activated');
                         }}
-                        className="w-full px-3 py-2 text-sm bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors font-medium"
-                        title="Show site evaluations and analytics"
+                        className="w-full px-3 py-2 text-sm bg-green-50 text-green-600 rounded-md hover:bg-green-100 transition-colors"
                       >
                         Show Site Analysis
                       </button>
@@ -703,7 +980,9 @@ const InfrastructureMapping = () => {
                 >
                   <MapEvents 
                     onMapClick={handleMapClick} 
-                    showingSiteSelection={siteSelectionMode} 
+                    showingSiteSelection={siteSelectionMode}
+                    onAddInfrastructure={handleAddInfrastructure}
+                    addingInfrastructure={addingInfrastructure}
                   />
                   
                   <LayersControl position="topright">
@@ -730,6 +1009,15 @@ const InfrastructureMapping = () => {
                             position={plant.coordinates}
                             icon={assetIcons.plant}
                           >
+                            <Tooltip direction="top" offset={[0, -10]} opacity={0.9}>
+                              <div className="text-center">
+                                <div className="font-semibold">{plant.name}</div>
+                                <div className="text-xs">{plant.capacity} | {plant.status}</div>
+                                {plant.createdBy && (
+                                  <div className="text-xs text-gray-500">by {plant.createdBy}</div>
+                                )}
+                              </div>
+                            </Tooltip>
                             <Popup>
                               <div className="p-2">
                                 <h4 className="font-semibold text-green-800">{plant.name}</h4>
@@ -739,6 +1027,91 @@ const InfrastructureMapping = () => {
                                   <strong>Production:</strong> {plant.productionRate}<br/>
                                   <strong>Status:</strong> {plant.status}<br/>
                                   <strong>Efficiency:</strong> {plant.efficiency}
+                                  {plant.createdBy && (
+                                    <React.Fragment>
+                                      <br/><strong>Added by:</strong> {plant.createdBy}
+                                      <br/><strong>Date:</strong> {new Date(plant.createdAt).toLocaleDateString()}
+                                    </React.Fragment>
+                                  )}
+                                  {plant.isUserAdded && (
+                                    <React.Fragment>
+                                      <br/><span className="text-green-600 font-medium">✓ Your Addition</span>
+                                    </React.Fragment>
+                                  )}
+                                  {plant.isCollaborative && (
+                                    <React.Fragment>
+                                      <br/><span className="text-blue-600 font-medium">🤝 Community Addition</span>
+                                    </React.Fragment>
+                                  )}
+                                </p>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        ))}
+                        
+                        {/* User Added Infrastructure */}
+                        {userInfrastructure.filter(infra => infra.type === 'plant').map((plant) => (
+                          <Marker
+                            key={plant.id}
+                            position={[plant.latitude, plant.longitude]}
+                            icon={assetIcons.plant}
+                          >
+                            <Tooltip direction="top" offset={[0, -10]} opacity={0.9}>
+                              <div className="text-center">
+                                <div className="font-semibold">{plant.name}</div>
+                                <div className="text-xs">{plant.capacity} | {plant.status}</div>
+                                <div className="text-xs text-green-600">✓ Your Addition</div>
+                              </div>
+                            </Tooltip>
+                            <Popup>
+                              <div className="p-2">
+                                <h4 className="font-semibold text-green-800">{plant.name}</h4>
+                                <p className="text-sm text-gray-600">
+                                  <strong>Type:</strong> Hydrogen Production Plant<br/>
+                                  <strong>Capacity:</strong> {plant.capacity}<br/>
+                                  <strong>Status:</strong> {plant.status}<br/>
+                                  <strong>Cost:</strong> {plant.cost}<br/>
+                                  <strong>Efficiency:</strong> {plant.efficiency}<br/>
+                                  <strong>Added by:</strong> {plant.createdBy}<br/>
+                                  <strong>Date:</strong> {new Date(plant.createdAt).toLocaleDateString()}<br/>
+                                  <span className="text-green-600 font-medium">✓ Your Addition</span>
+                                  {plant.description && (
+                                    <React.Fragment>
+                                      <br/><strong>Description:</strong> {plant.description}
+                                    </React.Fragment>
+                                  )}
+                                </p>
+                              </div>
+                            </Popup>
+                          </Marker>
+                        ))}
+                        
+                        {/* Collaborative Infrastructure */}
+                        {collaborativeInfrastructure.filter(infra => infra.type === 'plant').map((plant) => (
+                          <Marker
+                            key={plant.id}
+                            position={[plant.latitude, plant.longitude]}
+                            icon={assetIcons.plant}
+                          >
+                            <Tooltip direction="top" offset={[0, -10]} opacity={0.9}>
+                              <div className="text-center">
+                                <div className="font-semibold">{plant.name}</div>
+                                <div className="text-xs">{plant.capacity} | {plant.status}</div>
+                                <div className="text-xs text-blue-600">🤝 Community</div>
+                              </div>
+                            </Tooltip>
+                            <Popup>
+                              <div className="p-2">
+                                <h4 className="font-semibold text-green-800">{plant.name}</h4>
+                                <p className="text-sm text-gray-600">
+                                  <strong>Type:</strong> Hydrogen Production Plant<br/>
+                                  <strong>Capacity:</strong> {plant.capacity}<br/>
+                                  <strong>Status:</strong> {plant.status}<br/>
+                                  <strong>Cost:</strong> {plant.cost}<br/>
+                                  <strong>Efficiency:</strong> {plant.efficiency}<br/>
+                                  <strong>Added by:</strong> {plant.createdBy}<br/>
+                                  <strong>Date:</strong> {new Date(plant.createdAt).toLocaleDateString()}<br/>
+                                  <span className="text-blue-600 font-medium">🤝 Community Addition</span>
                                 </p>
                               </div>
                             </Popup>
@@ -1136,6 +1509,24 @@ const InfrastructureMapping = () => {
             </div>
           </motion.div>
         </div>
+
+        {/* Add Infrastructure Modal */}
+        <AddInfrastructureModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          location={newInfrastructureLocation}
+          onSave={handleSaveInfrastructure}
+        />
+
+        {/* Status indicator for adding infrastructure */}
+        {addingInfrastructure && (
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
+            <div className="bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center">
+              <MapPinIcon className="h-5 w-5 mr-2" />
+              Click on the map to add new infrastructure
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

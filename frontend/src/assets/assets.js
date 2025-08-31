@@ -260,8 +260,8 @@ export const features = [
 // Navigation items
 export const navigationItems = [
   { name: "Home", path: "/" },
+  { name: "Dashboard", path: "/comprehensive-dashboard" },
   { name: "Infrastructure Map", path: "/map" },
   { name: "Optimization", path: "/optimization" },
   { name: "Analytics", path: "/analytics" },
-  { name: "Dashboard", path: "/dashboard" },
 ];
