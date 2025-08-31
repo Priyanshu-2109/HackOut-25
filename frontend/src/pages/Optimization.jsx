@@ -544,12 +544,12 @@ const Optimization = () => {
                   Clear All Data
                 </button>
               </div>
-              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              {/* <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm text-gray-600">
                   <strong>Note:</strong> All data is stored locally in your browser. 
                   No information is sent to external databases. Use the buttons above to manage your local data.
                 </p>
-              </div>
+              </div> */}
             </div>
           </motion.div>
         </div>
