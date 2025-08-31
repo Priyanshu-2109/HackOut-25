@@ -537,12 +537,12 @@ const Analytics = () => {
               Generate New Sample Data
             </button>
           </div>
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          {/* <div className="mt-4 p-4 bg-blue-50 rounded-lg">
             <p className="text-sm text-blue-800">
               <strong>Note:</strong> All analytics are generated from localStorage data. 
               Charts and KPIs are calculated based on your optimization results or sample data.
             </p>
-          </div>
+          </div> */}
         </motion.div>
       </div>
     </div>
